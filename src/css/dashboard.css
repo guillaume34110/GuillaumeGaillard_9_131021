@@ -49,6 +49,7 @@
 }
 
 .bill-card {
+
   margin-top: 17px;
   margin-bottom: 17px;
   background: #0D5AE5;
@@ -116,4 +117,6 @@
   transform: rotate(90deg);
   cursor: pointer;
 }
+
+
 

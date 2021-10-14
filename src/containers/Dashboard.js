@@ -31,23 +31,25 @@ export const card = (bill) => {
   const firstName = firstAndLastNames.includes('.') ?
     firstAndLastNames.split('.')[0] : ''
   const lastName = firstAndLastNames.includes('.') ?
-  firstAndLastNames.split('.')[1] : firstAndLastNames
+    firstAndLastNames.split('.')[1] : firstAndLastNames
 
   return (`
-    <div class='bill-card' id='open-bill${bill.id}' data-testid='open-bill${bill.id}'>
-      <div class='bill-card-name-container'>
-        <div class='bill-card-name'> ${firstName} ${lastName} </div>
-        <span class='bill-card-grey'> ... </span>
+ 
+    <div data-set ="${bill.id}" class='bill-card' id='open-bill${bill.id}' data-testid='open-bill${bill.id}'>
+      <div data-set ="${bill.id}" class='bill-card-name-container'>
+        <div data-set ="${bill.id}" class='bill-card-name'> ${firstName} ${lastName} </div>
+        <span data-set ="${bill.id}" class='bill-card-grey'> ... </span>
       </div>
-      <div class='name-price-container'>
-        <span> ${bill.name} </span>
-        <span> ${bill.amount} € </span>
+      <div data-set ="${bill.id}" class='name-price-container'>
+        <span data-set ="${bill.id}" > ${bill.name} </span>
+        <span data-set ="${bill.id}" > ${bill.amount} € </span>
       </div>
-      <div class='date-type-container'>
-        <span> ${formatDate(bill.date)} </span>
-        <span> ${bill.type} </span>
+      <div data-set ="${bill.id}" class='date-type-container'>
+        <span data-set ="${bill.id}" > ${formatDate(bill.date)} </span>
+        <span data-set ="${bill.id}" > ${bill.type} </span>
       </div>
-    </div>
+      </div>
+   
   `)
 }
 
@@ -86,28 +88,39 @@ export default class {
   }
 
   handleEditTicket(e, bill, bills) {
-    if (this.counter === undefined || this.id !== bill.id) this.counter = 0
-    if (this.id === undefined || this.id !== bill.id) this.id = bill.id
-    if (this.counter % 2 === 0) {
-      bills.forEach(b => {
-        $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
+    console.log(e.target.dataset.set, 'tickets ', bill, 'bill', bills)
+    let targetData
+    if (!this.debounceFlag) {
+      this.debounceFlag = true
+      bills.forEach(b => {//pour toute les cards
+        if (e.target.dataset.set === b.id) targetData = b //retrouver la carte et la mettre dans la variable
       })
-      $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
-      $('.dashboard-right-container div').html(DashboardFormUI(bill))
-      $('.vertical-navbar').css({ height: '150vh' })
-      this.counter ++
-    } else {
-      $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
+      const dataset = $(`#open-bill${targetData.id}`)[0].dataset//dataset de l'element
+      if (dataset.counter === undefined) dataset.counter = 0
 
-      $('.dashboard-right-container div').html(`
+      if (this.id === undefined || this.id !== targetData.id) this.id = targetData.id
+      if (dataset.counter % 2 === 0) {//si pair
+        bills.forEach(b => {//pour toute les cards
+          $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })//background reset
+          if ($(`#open-bill${b.id}`)[0]) $(`#open-bill${b.id}`)[0].dataset.counter = 0
+          // on met le conteur dans le datset de l'element
+        })
+        $(`#open-bill${targetData.id}`).css({ background: '#2A2B35' })//
+        $('.dashboard-right-container div').html(DashboardFormUI(targetData))
+        $('.vertical-navbar').css({ height: '150vh' })
+        dataset.counter++
+      } else {
+        $(`#open-bill${targetData.id}`).css({ background: '#0D5AE5' })
+        $('.dashboard-right-container div').html(`
         <div id="big-billed-icon"> ${BigBilledIcon} </div>
       `)
-      $('.vertical-navbar').css({ height: '120vh' })
-      this.counter ++
+        $('.vertical-navbar').css({ height: '120vh' })
+        dataset.counter++
+      }
+      $('#icon-eye-d').click(this.handleClickIconEye)
+      $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, targetData))
+      $('#btn-refuse-bill').click((e) => this.handleRefuseSubmit(e, targetData))
     }
-    $('#icon-eye-d').click(this.handleClickIconEye)
-    $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, bill))
-    $('#btn-refuse-bill').click((e) => this.handleRefuseSubmit(e, bill))
   }
 
   handleAcceptSubmit = (e, bill) => {
@@ -130,57 +143,72 @@ export default class {
     this.onNavigate(ROUTES_PATH['Dashboard'])
   }
 
-  handleShowTickets(e, bills, index) {
-    if (this.counter === undefined || this.index !== index) this.counter = 0
+  handleShowTickets(e, bills, index) {/// afichage des cartes suite à l'appui sur la fleche
+    const dataset = $(`#arrow-icon${index}`)[0].dataset
+    console.log(dataset)
+    if (dataset.counterShow === undefined) dataset.counterShow = 0
     if (this.index === undefined || this.index !== index) this.index = index
-    if (this.counter % 2 === 0) {
-      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)'})
-      $(`#status-bills-container${this.index}`)
-        .html(cards(filteredBills(bills, getStatus(this.index))))
-      this.counter ++
+    console.log(index, 'index', dataset.counterShow)
+    if (dataset.counterShow % 2 === 0) { // si compteur pair
+      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)' })//rotation de la fleche
+      let item = $(`#status-bills-container${this.index}`)// les cards
+      item.html(cards(filteredBills(bills, getStatus(this.index))))//le remplissage des cards
+      dataset.counterShow++
     } else {
-      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)'})
-      $(`#status-bills-container${this.index}`)
+      $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)' })//rotation de la fleche
+      $(`#status-bills-container${this.index}`)//vidange du contenair
         .html("")
-      this.counter ++
+      dataset.counterShow++
     }
 
     bills.forEach(bill => {
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+
+      // eventlistener pour toutes les cards
+      document.querySelector(`#open-bill${bill.id}`)?.addEventListener('click', async (e) => {
+        console.log('bill', bill)
+
+        this.handleEditTicket(e, bill, bills)
+        await this.timeout(500)// anti rebond
+        this.debounceFlag = false//anti rebond drapeau
+      }
+      )// eventlistener pour toutes les cards
     })
 
     return bills
 
   }
 
+  timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
   // not need to cover this function by tests
   getBillsAllUsers = () => {
     if (this.firestore) {
       return this.firestore
-      .bills()
-      .get()
-      .then(snapshot => {
-        const bills = snapshot.docs
-        .map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          date: doc.data().date,
-          status: doc.data().status
-        }))
-        return bills
-      })
-      .catch(console.log)
+        .bills()
+        .get()
+        .then(snapshot => {
+          const bills = snapshot.docs
+            .map(doc => ({
+              id: doc.id,
+              ...doc.data(),
+              date: doc.data().date,
+              status: doc.data().status
+            }))
+          return bills
+        })
+        .catch(console.log)
     }
   }
-    
+
   // not need to cover this function by tests
   updateBill = (bill) => {
     if (this.firestore) {
-    return this.firestore
-      .bill(bill.id)
-      .update(bill)
-      .then(bill => bill)
-      .catch(console.log)
+      return this.firestore
+        .bill(bill.id)
+        .update(bill)
+        .then(bill => bill)
+        .catch(console.log)
     }
   }
 }
