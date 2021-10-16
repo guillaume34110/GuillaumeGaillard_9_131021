@@ -87,27 +87,34 @@ describe('Given I am connected as an Admin', () => {
   })
 
   describe('When I am on Dashboard page and I click on edit icon of a card', () => {
-    test('Then, right form should be filled', () => {
+    test('Then, right form should be filled',async () => {
+     
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock }) 
       const html = cards(bills)
       document.body.innerHTML = html
-
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Admin'
+      }))
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
-      const firestore = null
-
-      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+     
       const dashboard = new Dashboard({
-        document, onNavigate, firestore, bills, localStorage: window.localStorage
+        document, onNavigate, firestore :null, bills, localStorage: window.localStorage
       })
-
-      const handleEditTicket = jest.fn((e) => dashboard.handleEditTicket(e, bills[0], bills))   
+      const delay = ms => new Promise(res => setTimeout(res, ms));
+        
       const iconEdit = screen.getByTestId('open-bill47qAXb6fIm2zOKkLzMro')
+      const handleEditTicket = jest.fn((e) => dashboard.handleEditTicket( e, bills[0], bills))   
+
       iconEdit.addEventListener('click', handleEditTicket)
       userEvent.click(iconEdit)
       expect(handleEditTicket).toHaveBeenCalled()
+      await delay(800)
+      iconEdit.dataset.counter = 1
       userEvent.click(iconEdit)
       expect(handleEditTicket).toHaveBeenCalled()
+  
     })
   })
 

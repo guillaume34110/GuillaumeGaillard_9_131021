@@ -162,11 +162,9 @@ export default class {
     }
 
     bills.forEach(bill => {
-
-      // eventlistener pour toutes les cards
+    // eventlistener pour toutes les cards
       document.querySelector(`#open-bill${bill.id}`)?.addEventListener('click', async (e) => {
         console.log('bill', bill)
-
         this.handleEditTicket(e, bill, bills)
         await this.timeout(500)// anti rebond
         this.debounceFlag = false//anti rebond drapeau

@@ -109,3 +109,8 @@ tr td:nth-of-type(5) {
   font-weight: 500;
   color: #0E5AE5;
 }
+
+/*rajout */
+.modal-body img{
+  max-width:90%;
+}

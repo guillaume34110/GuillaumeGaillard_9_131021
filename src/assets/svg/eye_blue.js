@@ -1,7 +1,7 @@
-export default `<svg xmlns="http://www.w3.org/2000/svg"
+export default `<svg data-testid = "icon-eye-path" xmlns="http://www.w3.org/2000/svg"
 width="0.244444in" height="0.166667in"
 viewBox="0 0 22 15">
-<path id="Imported Path"
+<path id="Imported Path" 
    fill="#0D5AE5" stroke="none" stroke-width="0"
    d="M 11.00,0.00
       C 6.00,0.00 1.73,3.11 0.00,7.50

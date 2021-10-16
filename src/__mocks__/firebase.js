@@ -1,3 +1,5 @@
+import firebase from './firebase';
+
 export default {
   get: () => {
     return Promise.resolve({
@@ -62,5 +64,31 @@ export default {
         "fileUrl": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=4df6ed2c-12c8-42a2-b013-346c1346f732"
       }]
     })
-  }
-}
+  },
+  post: async (request) => { ///aded method
+    const getData = await firebase.get(); // import firebase 
+
+    return Promise.resolve({
+      data: [
+        ...getData.data,
+        {
+          id: request.id,
+          vat: request.vat,
+          pct: request.pct,
+          amount: request.amount,
+          commentAdmin: request.commentAdmin,
+          email: request.email,
+          name: request.name,
+          status: request.status,
+          fileName: request.filename,
+          fileUrl: request.fileUrl,
+          date: request.date,
+          commentary: request.commentary,
+          type: request.type,
+        },
+      ],
+    });
+  },
+};
+
+

@@ -52,37 +52,23 @@ export default class Login {
   // not need to cover this function by tests
   checkIfUserExists = (user) => {
     if (this.firestore) {
-      this.firestore
-      .user(user.email)
-      .get()
-      .then((doc) => {
+      this.firestore.user(user.email).get().then((doc) => {
         if (doc.exists) {
           console.log(`User with ${user.email} exists`)
           return true
-        } else {
-          return false
-        }
+        } else  return false
       })
       .catch(error => error)
-    } else {
-      return null
-    }
+    } else return null
   }
 
   // not need to cover this function by tests
   createUser = (user) => {
     if (this.firestore) {
-      this.firestore
-      .users()
-      .doc(user.email)
-      .set({
-        type: user.type,
-        name: user.email.split('@')[0] 
-      })
+      this.firestore.users().doc(user.email)
+      .set({ type: user.type,name: user.email.split('@')[0] })
       .then(() => console.log(`User with ${user.email} is created`))
       .catch(error => error)
-    } else {
-      return null
-    }
+    } else return null
   }
 } 
