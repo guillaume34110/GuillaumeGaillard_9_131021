@@ -21,8 +21,15 @@ export default class {
   }
 
   handleClickIconEye = (icon) => {
+    console.log(icon,"icon")
     const billUrl = icon.getAttribute("data-bill-url")
-    $('#modaleFile').find(".modal-body").html(`<div style='text-align: center;'><img  src=${billUrl} /></div>`)
+    $('#modaleFile').find(".modal-body").html(
+      `<div style='text-align: center;'>
+    <img  src=${billUrl} />
+    </div>
+    <a  href="${billUrl}" target="_blank" download class="btn btn-primary ">Télécharger le fichier</a>`// can' t downlad cross origin not supported
+
+    )
     $('#modaleFile').modal('show')
   }
 

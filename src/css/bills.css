@@ -113,4 +113,10 @@ tr td:nth-of-type(5) {
 /*rajout */
 .modal-body img{
   max-width:90%;
+  margin-bottom: 3vh;
+}
+.modal-body{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

@@ -29,7 +29,7 @@ const onNavigate = (pathname) => {
 
 function MockFile() { };
 
-MockFile.prototype.create = function (name, size, mimeType) { //creattion de fichier
+MockFile.prototype.create = function (name, size, mimeType) { //creattion de fichier from https://gist.github.com/josephhanson/372b44f93472f9c5a2d025d40e7bb4cc
   name = name || "mock.txt";
   size = size || 1024;
   mimeType = mimeType || 'plain/txt';
@@ -48,8 +48,8 @@ MockFile.prototype.create = function (name, size, mimeType) { //creattion de fic
 
   return blob;
 };
-
-
+/// autre utilisation possible que la fonction ci dessus
+//file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' });
 
 describe("Given I am connected as an employee", () => {
   describe("When I do not fill fields and I click on envoyer button", () => {
@@ -139,7 +139,45 @@ describe("Given I am connected as an employee", () => {
       expect(handleChangeFile).toBeCalled();
       // The name of the file should be 'pic.jpg'
       expect(inputFile.files[0].name).toBe('pic.jpg');
+     // expect(screen.getByText('.jpg')).toBeTruthy();
       expect(screen.getByText('Envoyer une note de frais')).toBeTruthy();
+
+    });
+  });
+  describe('When I choose an wrong file to upload', () => {
+    test('Then the file input should get "aucun fichier"', async () => {
+      const html = NewBillUI()
+      document.body.innerHTML = html
+
+      // Init newBill
+      const newBill = new NewBill({
+        document,
+        onNavigate,
+        firestore: null,
+        localStorage: window.localStorage,
+      });
+
+      const size = 1024 * 1024 * 2//create  txt
+      const mock = new MockFile()
+      const file = mock.create("txt.txt", size, "text")
+      expect(file.name).toBe("txt.txt")
+      expect(file.size).toBe(size);
+      expect(file.type).toBe( "text")
+      // Mock function handleChangeFile
+      const inputFile = screen.getByTestId("file");
+      const handleChangeFile = jest.fn(() => newBill.handleChangeFile)
+
+      inputFile.addEventListener('change', handleChangeFile);
+
+      // Launch event
+
+      fireEvent.change(inputFile, { target: { files: [file] } })
+
+      //handleChangeFile function must be called
+      expect(handleChangeFile).toBeCalled();
+      // The name of the file should be ""
+      expect(inputFile.value).toBe('');
+     // expect(screen.getByText('Aucun fichier choisi')).toBeTruthy();
 
     });
   });
