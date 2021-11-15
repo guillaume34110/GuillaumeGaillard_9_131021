@@ -92,40 +92,39 @@ export default class {
   }
 
   handleEditTicket(e, bill, bills) {
-    console.log(e.target.dataset.set, 'tickets ', bill, 'bill', bills)
+    // console.log(e.target.dataset.set, 'tickets ', bill, 'bill', bills)
     let targetData
-    if (!this.debounceFlag) {
-      this.debounceFlag = true
-      bills.forEach(b => {//pour toute les cards
-        if (e.target.dataset.set === b.id) targetData = b //retrouver la carte et la mettre dans la variable
-      })
-      const dataset = $(`#open-bill${targetData.id}`)[0].dataset//dataset de l'element
-      if (dataset.counter === undefined) dataset.counter = 0
 
-      if (this.id === undefined || this.id !== targetData.id) this.id = targetData.id
-      if (dataset.counter % 2 === 0) {//si pair
-        bills.forEach(b => {//pour toute les cards
-          $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })//background reset
-          if ($(`#open-bill${b.id}`)[0]) $(`#open-bill${b.id}`)[0].dataset.counter = 0
-          // on met le conteur dans le datset de l'element
-        })
-        $(`#open-bill${targetData.id}`).css({ background: '#2A2B35' })//
-        $('.dashboard-right-container div').html(DashboardFormUI(targetData))
-        $('.vertical-navbar').css({ height: '150vh' })
-        dataset.counter++
-      } else {
-        $(`#open-bill${targetData.id}`).css({ background: '#0D5AE5' })
-        $('.dashboard-right-container div').html(`
+    bills.forEach(b => {//pour toute les cards
+      if (e.target.dataset.set === b.id) targetData = b //retrouver la carte et la mettre dans la variable
+    })
+    const dataset = $(`#open-bill${targetData.id}`)[0].dataset//dataset de l'element
+    if (dataset.counter === undefined) dataset.counter = 0
+
+    if (this.id === undefined || this.id !== targetData.id) this.id = targetData.id
+    if (dataset.counter % 2 === 0) {//si pair
+      bills.forEach(b => {//pour toute les cards
+        $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })//background reset
+        if ($(`#open-bill${b.id}`)[0]) $(`#open-bill${b.id}`)[0].dataset.counter = 0
+        // on met le conteur dans le datset de l'element
+      })
+      $(`#open-bill${targetData.id}`).css({ background: '#2A2B35' })//
+      $('.dashboard-right-container div').html(DashboardFormUI(targetData))
+      $('.vertical-navbar').css({ height: '150vh' })
+      dataset.counter++
+    } else {
+      $(`#open-bill${targetData.id}`).css({ background: '#0D5AE5' })
+      $('.dashboard-right-container div').html(`
         <div id="big-billed-icon"> ${BigBilledIcon} </div>
       `)
-        $('.vertical-navbar').css({ height: '120vh' })
-        dataset.counter++
-      }
-      $('#icon-eye-d').click(this.handleClickIconEye)
-      $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, targetData))
-      $('#btn-refuse-bill').click((e) => this.handleRefuseSubmit(e, targetData))
+      $('.vertical-navbar').css({ height: '120vh' })
+      dataset.counter++
     }
+    $('#icon-eye-d').click(this.handleClickIconEye)
+    $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, targetData))
+    $('#btn-refuse-bill').click((e) => this.handleRefuseSubmit(e, targetData))
   }
+
 
   handleAcceptSubmit = (e, bill) => {
     const newBill = {
@@ -164,25 +163,23 @@ export default class {
         .html("")
       dataset.counterShow++
     }
+    bills.forEach(bill => {// les eventlisteners étaient ajouté a chaque fois il y avais du coup superposition des event
 
-    bills.forEach(bill => {
-    // eventlistener pour toutes les cards
-      document.querySelector(`#open-bill${bill.id}`)?.addEventListener('click', async (e) => {
-        console.log('bill', bill)
+      const drawBill = (e) => { // fonction qui appele celle qui affiche la nouvelle facture
         this.handleEditTicket(e, bill, bills)
-        await this.timeout(500)// anti rebond
-        this.debounceFlag = false//anti rebond drapeau
       }
-      )// eventlistener pour toutes les cards
+      let selectedBill = document.querySelector(`#open-bill${bill.id}`)
+      if (selectedBill) { // clonage pour enlever les events
+        let selectedBillClone = selectedBill.cloneNode(true)
+        selectedBill.parentNode.replaceChild(selectedBillClone, selectedBill)
+      }
+      document.querySelector(`#open-bill${bill.id}`)?.addEventListener('click', drawBill)// eventlistener pour toutes les cards affichés
     })
 
     return bills
 
   }
 
-  timeout(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
   // not need to cover this function by tests
   getBillsAllUsers = () => {
     if (this.firestore) {
