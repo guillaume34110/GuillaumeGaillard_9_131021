@@ -46,6 +46,7 @@ $jest src/__tests__/your_test_file.js
 **Comment voir la couverture de test :**
 
 `http://127.0.0.1:8080/coverage/lcov-report/`
+
 ![Captufere](https://user-images.githubusercontent.com/29097422/141933317-bb52bce6-4e87-49b4-9215-cfd324542e3f.JPG)
 
 
