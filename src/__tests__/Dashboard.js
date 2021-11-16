@@ -90,31 +90,37 @@ describe('Given I am connected as an Admin', () => {
     test('Then, right form should be filled',async () => {
      
       Object.defineProperty(window, 'localStorage', { value: localStorageMock }) 
-      const html = cards(bills)
-      document.body.innerHTML = html
-      window.localStorage.setItem('user', JSON.stringify({
+    
+      window.localStorage.setItem('user', JSON.stringify({ // loggé comme admin
         type: 'Admin'
       }))
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
      
-      const dashboard = new Dashboard({
+      const dashboard =  new Dashboard({
         document, onNavigate, firestore :null, bills, localStorage: window.localStorage
       })
-      const delay = ms => new Promise(res => setTimeout(res, ms));
-        
-      const iconEdit = screen.getByTestId('open-bill47qAXb6fIm2zOKkLzMro')
-      const handleEditTicket = jest.fn((e) => dashboard.handleEditTicket( e, bills[0], bills))   
+      let newData = {} 
+      newData.bills = bills
+     let html = DashboardUI({ data: newData })
+      
+      document.body.innerHTML = html
+      const delay = ms => new Promise(res => setTimeout(res, ms)); // creation d'un delais pour permettre l'affichage (obsolette)
+     /*deploiement de la liste*/
+     const handleShowTickets1 = jest.fn((e) => dashboard.handleShowTickets(e, bills, 1))    
+     const iconArrow1 = screen.getByTestId('arrow-icon1')
+     iconArrow1.addEventListener('click', handleShowTickets1)
+      userEvent.click(iconArrow1)
 
-      iconEdit.addEventListener('click', handleEditTicket)
-      userEvent.click(iconEdit)
-      expect(handleEditTicket).toHaveBeenCalled()
-      await delay(800)
+     const iconEdit = screen.getByTestId('open-bill47qAXb6fIm2zOKkLzMro') // selection de l'iconne
+      const handleEditTicket = jest.fn((e) => dashboard.handleEditTicket( e, bills[0], bills)) //appel de la fonction handleEditTicket()  
+      iconEdit.addEventListener('click', handleEditTicket)// mise en place de l'evenement declencheur
       iconEdit.dataset.counter = 1
-      userEvent.click(iconEdit)
-      expect(handleEditTicket).toHaveBeenCalled()
-  
+    
+      userEvent.click(iconEdit)//click sur l'iconne
+      expect(handleEditTicket).toHaveBeenCalled() // la fonction est elle appelé?
+      expect(screen.getByText('Commentaire')).toBeTruthy()// le justificatif est il bien affiché
     })
   })
 

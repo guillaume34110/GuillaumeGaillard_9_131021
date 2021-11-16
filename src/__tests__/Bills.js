@@ -31,7 +31,7 @@ describe("Given I am connected as an employee", () => {
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
-    test("Then loading = true", () => {
+    test("Then loading = true", () => {// test de l'affichage du loadding
       const html = BillsUI({ data: [], loading: true })
       document.body.innerHTML = html
       expect(LoadingPage())
@@ -40,54 +40,54 @@ describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
     test("Then error = true", () => {
       const html = BillsUI({ data: [], error: true })
-      document.body.innerHTML = html
+      document.body.innerHTML = html// test de l'affichage du message d'erreur
       expect(ErrorPage())
     })
   })
   describe("When I am on Bills Page", () => {
-    test("then i click on icon eye a popup window apear", () => {
+    test("then i click on icon eye a popup window apear", () => { // test affichage du popup qui contient le justificatif
 
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
+      window.localStorage.setItem('user', JSON.stringify({// log en tant qu'employé
         type: 'Employee'
       }))
-      const html = BillsUI({ data: [bills[0]] })
-      document.body.innerHTML = html
-      const onNavigate = (pathname) => {
+      const html = BillsUI({ data: [bills[0]] }) // mise en place de BillsUI dans une constante
+      document.body.innerHTML = html // affichage de BillsUI
+      const onNavigate = (pathname) => { // creation de la fonction de routage
         document.body.innerHTML = ROUTES({ pathname })
       }
-      const firestore = null
-      const newBills = new Bills({ document, onNavigate, firestore, localStorage })
+      const firestore = null //config du firestore
+      const newBills = new Bills({ document, onNavigate, firestore, localStorage })// creation des bill
       $.fn.modal = jest.fn();//comportement du mock
-      const eye = screen.getByTestId("icon-eye")
+      const eye = screen.getByTestId("icon-eye")// recuperation de l'iconne a cliqué
       const handleClickIconEye = jest.fn(() => newBills.handleClickIconEye(eye))// eye element inside handleclick
-      eye.addEventListener('click', handleClickIconEye)
-      userEvent.click(eye)
-      expect(handleClickIconEye).toHaveBeenCalled()
-      expect(screen.getByText('Justificatif')).toBeTruthy()
+      eye.addEventListener('click', handleClickIconEye) // mise en place de l'evenment declencheur
+      userEvent.click(eye)//click sur l'élement en question
+      expect(handleClickIconEye).toHaveBeenCalled()//handleClick a t'il été bien appelé
+      expect(screen.getByText('Justificatif')).toBeTruthy()// le justificatif est il bien affiché
     })
   })
-  describe("When I am on Bills Page", () => {
-    test("then i click on NewBill button i must be redirect to NewBill", () => {
+  describe("When I am on Bills Page", () => { 
+    test("then i click on NewBill button i must be redirect to NewBill", () => {// test de redirection vers newBill
 
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-      window.localStorage.setItem('user', JSON.stringify({
+      window.localStorage.setItem('user', JSON.stringify({// log en tant qu'employé
         type: 'Employee'
       }))
-      const html = BillsUI({ data: [bills[0]] })
-      document.body.innerHTML = html
-      const onNavigate = (pathname) => {
+      const html = BillsUI({ data: [bills[0]] })// mise en place de BillsUI dans une constante
+      document.body.innerHTML = html // affichage de BillsUI
+      const onNavigate = (pathname) => {// creation de la fonction de routage
         document.body.innerHTML = ROUTES({ pathname })
       }
-      const firestore = null
-      const newBills = new Bills({ document, onNavigate, firestore, localStorage })
+      const firestore = null //config du firestore
+      const newBills = new Bills({ document, onNavigate, firestore, localStorage })// creation des bill
       // $.fn.modal = jest.fn();//comportement du mock
-      const btn = screen.getByTestId("btn-new-bill")
+      const btn = screen.getByTestId("btn-new-bill")// recupération du boutton
       const handleClickNewBill = jest.fn(() => newBills.handleClickNewBill)// btn element inside handleclick
-      btn.addEventListener('click', handleClickNewBill)
-      userEvent.click(btn)
-      expect(handleClickNewBill).toHaveBeenCalled()
-      expect(screen.getByText('Envoyer une note de frais')).toBeTruthy()
+      btn.addEventListener('click', handleClickNewBill)//mise en place de l'evenment click
+      userEvent.click(btn) // click sur le bouuton
+      expect(handleClickNewBill).toHaveBeenCalled() // la fonction est elle bien appelée ?
+      expect(screen.getByText('Envoyer une note de frais')).toBeTruthy() // les élements affichés sont il les bons
     })
   })
 })
@@ -96,28 +96,28 @@ describe("Given I am connected as an employee", () => {
 describe("Given I am a user connected as Employee", () => {
   describe("When I navigate to Bills", () => {
     test("fetches bills from mock API GET", async () => {
-       const getSpy = jest.spyOn(firebase, "get")
-       const bills = await firebase.get()
+       const getSpy = jest.spyOn(firebase, "get") // recupération de létat du get (applé ou non)
+       const bills = await firebase.get() //attente de la réponse de firebase
        expect(getSpy).toHaveBeenCalledTimes(1)
-       expect(bills.data.length).toBe(4)
+       expect(bills.data.length).toBe(4) //recupération de 4 bills attendu
     })
     test("fetches bills from an API and fails with 404 message error", async () => {
-      firebase.get.mockImplementationOnce(() =>
+      firebase.get.mockImplementationOnce(() => // mise en place du mock
         Promise.reject(new Error("Erreur 404"))
       )
-      const html =  BillsUI({ error: "Erreur 404" })
-      document.body.innerHTML = html
-      const message = await screen.getByText(/Erreur 404/)
-      expect(message).toBeTruthy()
+      const html =  BillsUI({ error: "Erreur 404" }) // construction de la page avec une erreur
+      document.body.innerHTML = html // creation de la page
+      const message = await screen.getByText(/Erreur 404/) // attente du message d'erreur
+      expect(message).toBeTruthy() //recupération du message d'erreur
     })
     test("fetches messages from an API and fails with 500 message error", async () => {
-      firebase.get.mockImplementationOnce(() =>
+      firebase.get.mockImplementationOnce(() => // mise en place du mock
         Promise.reject(new Error("Erreur 500"))
       )
-      const html = BillsUI({ error: "Erreur 500" })
-      document.body.innerHTML = html
-      const message = await screen.getByText(/Erreur 500/)
-      expect(message).toBeTruthy()
+      const html = BillsUI({ error: "Erreur 500" }) // construction de la page avec une erreur
+      document.body.innerHTML = html // creation de la page
+      const message = await screen.getByText(/Erreur 500/)// attente du message d'erreur
+      expect(message).toBeTruthy()//recupération du message d'erreur
     })
   })
 })

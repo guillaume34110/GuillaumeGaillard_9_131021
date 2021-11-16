@@ -87,38 +87,42 @@ export default class {
     <img width=${imgWidth} src=${billUrl} />
     </div>
     <a  href="${billUrl}" target="_blank" download class="btn btn-primary ">Télécharger le fichier</a>
-    `)
+    `) //ajout du bouton de telechargement
     if (typeof $('#modaleFileAdmin1').modal === 'function') $('#modaleFileAdmin1').modal('show')
   }
 
   handleEditTicket(e, bill, bills) {
     // console.log(e.target.dataset.set, 'tickets ', bill, 'bill', bills)
-    let targetData
-
+    let targetData = null
+    let protection = 0
     bills.forEach(b => {//pour toute les cards
       if (e.target.dataset.set === b.id) targetData = b //retrouver la carte et la mettre dans la variable
     })
+   // if (targetData === null  ) targetData = bill
     const dataset = $(`#open-bill${targetData.id}`)[0].dataset//dataset de l'element
     if (dataset.counter === undefined) dataset.counter = 0
 
     if (this.id === undefined || this.id !== targetData.id) this.id = targetData.id
-    if (dataset.counter % 2 === 0) {//si pair
-      bills.forEach(b => {//pour toute les cards
+    if (dataset.counter % 2 === 0 && protection === 0) {//si pair
+       protection = 1
+      bills.forEach(b => {//pour toute les cards reset 
         $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })//background reset
         if ($(`#open-bill${b.id}`)[0]) $(`#open-bill${b.id}`)[0].dataset.counter = 0
-        // on met le conteur dans le datset de l'element
+        // on met le conteur dans le datset de l'element a 0
       })
-      $(`#open-bill${targetData.id}`).css({ background: '#2A2B35' })//
+      $(`#open-bill${targetData.id}`).css({ background: '#2A2B35' })
       $('.dashboard-right-container div').html(DashboardFormUI(targetData))
       $('.vertical-navbar').css({ height: '150vh' })
       dataset.counter++
-    } else {
+     
+    } else if (dataset.counter % 2 !== 0 && protection === 0) {
       $(`#open-bill${targetData.id}`).css({ background: '#0D5AE5' })
       $('.dashboard-right-container div').html(`
         <div id="big-billed-icon"> ${BigBilledIcon} </div>
       `)
       $('.vertical-navbar').css({ height: '120vh' })
       dataset.counter++
+      protection = 1
     }
     $('#icon-eye-d').click(this.handleClickIconEye)
     $('#btn-accept-bill').click((e) => this.handleAcceptSubmit(e, targetData))
@@ -147,17 +151,17 @@ export default class {
   }
 
   handleShowTickets(e, bills, index) {/// afichage des cartes suite à l'appui sur la fleche
-    const dataset = $(`#arrow-icon${index}`)[0].dataset
-    console.log(dataset)
-    if (dataset.counterShow === undefined) dataset.counterShow = 0
+    const dataset = $(`#arrow-icon${index}`)[0].dataset // recuperation des données du menu 
+   // console.log(dataset)
+    if (dataset.counterShow === undefined) dataset.counterShow = 0 //counter setting
     if (this.index === undefined || this.index !== index) this.index = index
     console.log(index, 'index', dataset.counterShow)
-    if (dataset.counterShow % 2 === 0) { // si compteur pair
+    if (dataset.counterShow % 2 === 0) { // si compteur pair on deploie le menu 
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(0deg)' })//rotation de la fleche
       let item = $(`#status-bills-container${this.index}`)// les cards
       item.html(cards(filteredBills(bills, getStatus(this.index))))//le remplissage des cards
       dataset.counterShow++
-    } else {
+    } else { // on retracte le menu
       $(`#arrow-icon${this.index}`).css({ transform: 'rotate(90deg)' })//rotation de la fleche
       $(`#status-bills-container${this.index}`)//vidange du contenair
         .html("")
@@ -165,7 +169,7 @@ export default class {
     }
     bills.forEach(bill => {// les eventlisteners étaient ajouté a chaque fois il y avais du coup superposition des event
 
-      const drawBill = (e) => { // fonction qui appele celle qui affiche la nouvelle facture
+      const drawBill = (e) => { // fonction qui appelle celle qui affiche la nouvelle facture
         this.handleEditTicket(e, bill, bills)
       }
       let selectedBill = document.querySelector(`#open-bill${bill.id}`)

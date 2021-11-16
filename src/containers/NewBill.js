@@ -15,9 +15,11 @@ export default class NewBill {
     this.fileName = null
     new Logout({ document, localStorage, onNavigate })
   }
-  handleChangeFile = e => {//probleme ici il faut un fichier existant pour que ca marche
+  handleChangeFile = e => {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]//recuperation du fichier
-    if (file.name.toLowerCase().includes('.jpg') || file.name.toLowerCase().includes('.jpeg') || file.name.toLowerCase().includes('.png')) {
+    if (file.name.toLowerCase().includes('.jpg') 
+    || file.name.toLowerCase().includes('.jpeg') 
+    || file.name.toLowerCase().includes('.png')) {
       const filePath = e.target.value.split(/\\/g)//decomposition du nom en array va chaque /
       let newFileName = filePath[filePath.length - 1]//extraction du nom via le dernier bout du array
       //newFileName.replace(/ /g, '')

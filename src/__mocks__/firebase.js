@@ -68,7 +68,7 @@ export default {
   post: async (request) => { ///aded method
     const getData = await firebase.get(); // import firebase 
 
-    return Promise.resolve({
+    return Promise.resolve({ // les datas a récuperer
       data: [
         ...getData.data,
         {
